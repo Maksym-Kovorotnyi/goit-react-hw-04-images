@@ -1,9 +1,13 @@
 import css from './ImageGalleryItem.module.css';
 import { FallingLines } from 'react-loader-spinner';
+import { useContext } from 'react'
+import { GalleryContext } from '../../Context/Gallery.context'
 
-export const Item = ({ images, onClick, Loader }) => {
+export const Item = () => {
+    const { images, isLoad, handleClickImg } = useContext(GalleryContext)
     return <>
-        {images.map(({ id, webformatURL }) => <li onClick={onClick} className={css.item} key={id} id={id}>{Loader? <FallingLines
+        {images.map(({id, webformatURL}) =>
+            <li onClick={handleClickImg} className={css.item} key={id} id={id}>{isLoad ? <FallingLines
                     color="#4fa94d"
                     width="100"
                     visible={true}
