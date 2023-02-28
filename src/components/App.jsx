@@ -45,10 +45,16 @@ export const App = ()=> {
       setModalOpen(!modalOpen);
        const imageId = e.currentTarget.id;
   const image = images.find((image) => image.id === Number(imageId));
-      setModalImg({...image}); 
+      setModalImg({ ...image }); 
+      window.addEventListener('keydown', handleCloseModalByEsc)
     }
   };
 
+  const handleCloseModalByEsc = (e) => {
+    if (e.keyCode === 27) {
+      setModalOpen(false)
+    }
+  }
   const moreOnPage = async () => {
     try {
     const promise = await axios.get(`?key=${MY_KEY}&per_page=12&page=${page+1}&q=${search}`);
