@@ -1,14 +1,15 @@
-
+import { searchQuery } from 'Service/API';
+import { moreOnPage } from 'Service/API';
 import axios from 'axios';
 import { SearchBar } from "./Searchbar/Searchbar";
 import { Gallery } from "./ImageGallery/ImageGallery";
 import { Modal } from "./Modal/Modal";
 import { LoadMoreBtn } from "./Button/Button";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GalleryContext } from 'Context/Gallery.context';
 
 axios.defaults.baseURL = 'https://pixabay.com/api/'
-const MY_KEY = '33229711-19a5fd6125c37356a31dee8eb'
+
 
 export const App = ()=> {
   const [images, setImages] = useState([]);
@@ -17,28 +18,36 @@ export const App = ()=> {
   const [isLoad, setIsLoad] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [submit, setSubmit] = useState(false);
+  const [LoadMore, setLoadMore] = useState(false)
  
-
-  const searchQuery = async (searchParam) => {
-    try {
-      setIsLoad(true)
-      const promise = await axios.get(`?key=${MY_KEY}&per_page=12&page=${page}&q=${searchParam}`);
-        const data = promise.data;
-      setImages(data.hits);
-      setIsLoad(false)
-      } catch (error) {
-        alert('Something wrong')
-      }
+  useEffect(() => {
+    if(!search) return
+    if(submit){
+      searchQuery(search, page, setIsLoad, setImages,)
+      setSubmit(false)
     }
+    else if(LoadMore){
+      moreOnPage(setImages, page, search,)
+      setLoadMore(false)
+      }
 
+}, [submit, LoadMore, search, page])
+  
+ 
   const handleReadInput = (e) => {
     setSearch(e.target.value)
-    setPage(1)
+    setPage(1) 
   }
 
   const handleSubmit = (e) => {
+    if (search === '') {
+      e.preventDefault()
+      return
+    }
     e.preventDefault()
-    searchQuery(search)
+    setSubmit(true)
+    setPage(1)
   }
 
   const handleClickImg = (e) => {
@@ -56,26 +65,16 @@ export const App = ()=> {
       setModalOpen(false)
     }
   }
-  const moreOnPage = async () => {
-    try {
-    const promise = await axios.get(`?key=${MY_KEY}&per_page=12&page=${page+1}&q=${search}`);
-    const data = promise.data;
-      setImages(prev => [...prev, ...data.hits])   
-  } catch (error) {
-    alert('Something wrong')
-     }
-  }
-  
-
+ 
   const handleLoadMore = () => {
     setPage(prev => prev + 1)
-    moreOnPage()
+    setLoadMore(true)
     }
 
   
   
   const { largeImageURL } = modalImg
-
+console.log(submit);
     return (<>
       < SearchBar
         onSubmit={handleSubmit}
@@ -90,8 +89,7 @@ export const App = ()=> {
       {modalOpen ? <Modal
         Image={largeImageURL}
         onClick={handleClickImg}
-      />: ''}
+      />: null}
     
-    </>)
-  
+    </>) 
 }
