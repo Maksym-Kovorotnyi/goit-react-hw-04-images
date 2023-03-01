@@ -33,6 +33,7 @@ export const App = ()=> {
 
   const handleReadInput = (e) => {
     setSearch(e.target.value)
+    setPage(1)
   }
 
   const handleSubmit = (e) => {
